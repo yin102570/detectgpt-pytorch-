@@ -1,4 +1,3 @@
-
 # DetectGPT: Zero-Shot Machine-Generated Text Detection using Probability Curvature
 
 ## Refactored implementation of the experiments in the [DetectGPT paper](https://arxiv.org/abs/2301.11305v1).
@@ -67,3 +66,4 @@ publisher = {arXiv},
 year = {2023},
 
 }
+
