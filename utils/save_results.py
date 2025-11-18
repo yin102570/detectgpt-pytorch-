@@ -1,5 +1,21 @@
 import os
 import json
+import numpy as np
+
+def default_serializer(obj):
+    """自定义 JSON 序列化函数，处理 numpy 类型"""
+    if isinstance(obj, (np.int_, np.intc, np.intp, np.int8, np.int16, np.int32, np.int64,
+                       np.uint8, np.uint16, np.uint32, np.uint64)):
+        return int(obj)
+    elif isinstance(obj, (np.float_, np.float16, np.float32, np.float64)):
+        return float(obj)
+    elif isinstance(obj, (np.ndarray,)):
+        return obj.tolist()
+    elif isinstance(obj, (np.bool_)):
+        return bool(obj)
+    else:
+        raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
+
 import matplotlib.pyplot as plt
 
 # 15 colorblind-friendly colors
@@ -93,12 +109,16 @@ def save_results(args, config, baseline_outputs, outputs):
     if not args.skip_baselines:
         # write likelihood threshold results to a file
         with open(os.path.join(SAVE_FOLDER, f"likelihood_threshold_results.json"), "w") as f:
-            json.dump(baseline_outputs[0], f)
+            json.dump(baseline_outputs, f, default=default_serializer, indent=2)
 
         if args.openai_model is None:
             # write rank threshold results to a file
-            with open(os.path.join(SAVE_FOLDER, f"rank_threshold_results.json"), "w") as f:
-                json.dump(baseline_outputs[1], f)
+            if len(baseline_outputs) >= 2:  # 确保列表至少有2个元素
+                with open(os.path.join(SAVE_FOLDER, f"rank_threshold_results.json"), "w") as f:
+                    json.dump(baseline_outputs[1], f)
+            else:
+                print("⚠️ baseline_outputs数据不足，跳过rank_threshold_results保存")
+            
 
             # write log rank threshold results to a file
             with open(os.path.join(SAVE_FOLDER, f"logrank_threshold_results.json"), "w") as f:
