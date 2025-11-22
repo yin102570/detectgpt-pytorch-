@@ -3,12 +3,10 @@
 - test.wp_target
 - valid.wp_target
 
-因完整数据集包含较大文件，已将整个writingPrompts数据集文件夹上传至云盘，可通过以下链接查看并下载缺失文件（如train.wp_target）：
-[writingPrompts数据集完整文件夹](https://drive.google.com/drive/folders/1jEgYFXV_Bs89-W1pTQdkAQ_mvmpheA-u?usp=sharing)
-
-
+因 `train.wp_target` 文件过大（868.12 MB），无法直接上传至GitHub，可通过以下链接下载：
+[train.wp_target 云盘下载链接](https://drive.google.com/file/d/1FGHUBl_U8hjdpicbubQ_aDGuViVomhyU/view?usp=sharing)
 
 ## 下载后操作
-1. 点击链接进入云盘文件夹，下载所需的数据集文件；
-2. 将下载的文件直接放到当前本地文件夹（data/writingPrompts/）；
+1. 点击链接下载 `train.wp_target` 文件；
+2. 将文件放置于当前目录（`data/writingPrompts/`）；
 3. 重启项目即可正常读取完整数据集。
