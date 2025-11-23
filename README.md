@@ -1,53 +1,65 @@
 # DetectGPT: Zero-Shot Machine-Generated Text Detection using Probability Curvature
 
-## Refactored implementation of the experiments in the [DetectGPT paper](https://arxiv.org/abs/2301.11305v1).
+重构自[DetectGPT paper](https://arxiv.org/abs/2301.11305v1)中的实验实现。
 
-An interactive demo of DetectGPT can be found [here](https://detectgpt.ericmitchell.ai).
+体验DetectGPT的交互式演示，请访问[此处](https://detectgpt.ericmitchell.ai).
 
-## Instructions
-1. First, install the Python dependencies: <br/>
-    `$ python3 -m venv env` <br/>
-    `$ source env/bin/activate` <br/>
-    `$ pip install -r requirements.txt` <br/>
-  
-2. Second, run main.py file (or any of the scripts in `paper_scripts/`): <br/>
-`python run.py --base_model_name gpt2 --mask_filling_model_name t5-small --DEVICE cuda`
+## 安装说明
 
-3. If you'd like to run the WritingPrompts experiments, you'll need to download the WritingPrompts data from [here](https://www.kaggle.com/datasets/ratthachat/writing-prompts). Save the data into a directory `data/writingPrompts`.
- 
+1. **安装Python依赖：**
 
-**Note: Intermediate results are saved in `tmp_results/`. If your experiment completes successfully, the results will be moved into the `results/` directory.**
+   ```bash
+   python3 -m venv env
+   source env/bin/activate
+   pip install -r requirements.txt
+   ```
 
-## Interpreting the results
-Once you successfully run the script, the results will be saved in the `results/` directory. The program generates various files and here is their description:
+2. **运行主程序：**
 
-1. **args.json** <br/>
-This contains the command line arguments that were passed when the `main.py` file was run.
-2. **entropy_threshold_results.json** <br/>
-This file has several fields in it. The *prediction* field holds the entropy values of the real text and the sampled text. If you set *n_samples* to 200, each of the subfields (i.e ["predictions"]["real"] and  ["predictions"]["samples"]) will contain 200 values. The *raw_results* field is a list of *n_samples* dictionary where each dictionary contains the original text and its corresponding entropy value (denoted by *original_crit*), the sampled text and its corresponding entropy value (denoted by *sampled_crit*). There are some more fields towards the end of the file (for eg.  *metrics*, *pr_metrics*, etc) but I don't know what they mean.
-3. **likelihood_threshold_results.json** <br/>
-This file has exactly the same structure but now the values are mean log likelihoods.
-4. **rank_threshold_results.json** <br/>
-Same as above, but now the values are the negative rank values.
-5. **logrank_threshold_results.json** <br/>
-Same as above, but now the values are negative logrank values.
+   使用以下命令启动主程序或`paper_scripts/`目录下的任意脚本：
 
-Finally, based on the values you select for *n_perturbation_list*, you will have more files. For eg. if you set *n_perturbation_list* to 1,10, you will have four more files:
+   ```bash
+   python run.py --base_model_name gpt2 --mask_filling_model_name t5-small --DEVICE cuda
+   ```
 
- 1. **perturbation_1_d_results.json** <br/>
-	* The ["prediction"]["real"] field stores the unnormalized perturbation discrepancy for the real text (written by human) with just one (i.e *k=1*) perturbed original text to approximate the expectation term in eq 1 of the paper). The ["prediction"]["samples"] field stores the same thing but for the machine generated text. Each of the ["prediction"]["real"] and ["prediction"]["samples"] should contain *n_samples* number of entries.
-	* The *raw_results* field contain *n_samples* dictionaries. Each dictionary holds the original text (*original*) and its original loglikelihood (*original_ll*), perturbed original text (*perturbed_original*; should be a list with just one string because we are only using one string to approximate the expectation term) and its loglikelihood (*all_perturbed_original_ll*; should be a list with just one entry), machine generated sample (*sampled*) and its loglikelihood (*sampled_ll*), perturbed sample (*perturbed_sampled*; again, should be a list on just one string) and its loglikelihood (*all_perturbed_sampled_ll*; again, should be a list with just one entry). 
-	* The *perturbed_original_ll* holds the mean of the *all_perturbed_original_ll* list and the *perturbed_original_ll_std* holds the standard deviation. Same goes for *perturbed_sampled_ll* and *perturbed_sampled_ll_std*.
+3. **WritingPrompts实验：**
 
-2. **perturbation_1_z_results.json** <br/>
-Exactly same as above but the ["prediction"]["real"] and ["prediction"]["samples"] now store the **normalized perturbation discrepancy** values.
+   若要运行WritingPrompts实验，需要从[这里](https://www.kaggle.com/datasets/ratthachat/writing-prompts)下载WritingPrompts数据，并将其保存至`data/writingPrompts`目录。
 
-3. **perturbation_10_d_results.json** <br/>
-Contains unnormalized perturbation discrepancy values. The only difference is that since we are using 10 perturbed samples to approximate the expectation term in eq. 1 of the paper, *perturbed_original*, *all_perturbed_original_ll*, *perturbed_sampled*, and *all_perturbed_sampled_ll* should now contain 10 values each.
+**注意：**实验的中间结果将保存在`tmp_results/`目录下。如果实验成功完成，结果会被移动至`results/`目录。
 
-4. **perturbation_10_z_results.json** <br/>
-Same as above but contains **normalized perturbation discrepancy** values.
+## 结果解释
 
+成功运行脚本后，结果将被保存至`results/`目录。程序生成的文件及其说明如下：
+
+1. **args.json**
+   - 包含执行`main.py`时传递的命令行参数。
+
+2. **entropy_threshold_results.json**
+   - *predictions*字段存储真实文本与采样文本的熵值。*raw_results*字段为一个列表，包含每个样本的原始文本及其对应的熵值（*original_crit*），采样文本及其熵值（*sampled_crit*）。其他字段如*metrics*和*pr_metrics*未详细解释。
+
+3. **likelihood_threshold_results.json**
+   - 结构与上述文件相同，但值为平均对数似然。
+
+4. **rank_threshold_results.json**
+   - 结构与上述文件相同，但值为负排名值。
+
+5. **logrank_threshold_results.json**
+   - 结构与上述文件相同，但值为负对数排名值。
+
+根据*n_perturbation_list*的配置，可能会生成下述文件：
+
+1. **perturbation_1_d_results.json**
+   - 存储未归一化的扰动差异值，每个结果包含原始文本、采样文本及其对数似然等信息。
+
+2. **perturbation_1_z_results.json**
+   - 存储归一化的扰动差异值。
+
+3. perturbation_10_d_results.json
+   - 与*perturbation_1_d_results.json*类似，但使用10个扰动样本。
+
+4. perturbation_10_z_results.json
+   - 与perturbation_1_z_results.json类似，但使用10个扰动样本。
 
 ## Citing the paper
 
@@ -66,4 +78,3 @@ publisher = {arXiv},
 year = {2023},
 
 }
-
