@@ -1,4 +1,4 @@
-# detectgpt: 大语言模型生成文本检测项目
+# DetectGPT: 大语言模型生成文本检测项目
 **Project Status**: 完成核心算法复现 & 全流程工程优化  
 **Framework Support**: Python 3.12 | PyTorch 2.6.0 (cu126)  
 **License**: MIT License
@@ -13,7 +13,7 @@
 3. **小样本优化**: 新增文本长度过滤、自适应扰动参数、填充失败回退策略，提升小样本场景下检测结果的稳定性；  
 4. **全流程可复现**: 提供详细的环境配置脚本、实验运行指南、结果分析模板，确保算法逻辑与性能可复现。
 
-### 算法原理通俗解释
+### 算法核心原理
 DetectGPT 的核心洞察是：**AI 生成文本在语言模型的概率空间中更"平滑"，人类文本更"曲折"**。  
 - 对输入文本进行微小扰动（如随机掩码+T5模型填充同义词/短语），生成语义不变的扰动样本；  
 - 计算原始文本与扰动样本在预训练语言模型中的对数似然值（概率得分）；  
@@ -26,22 +26,33 @@ DetectGPT 的核心洞察是：**AI 生成文本在语言模型的概率空间�
 
 ## 项目架构
 ```
-detectgpt/
-├── utils/               # 工具函数核心目录
-│   ├── generate_data.py # 数据集加载、过滤、预处理（含小样本回退机制）
-│   ├── custom_datasets.py # 自定义数据集接口（支持格式标准化）
-│   ├── mask_filling.py  # 文本扰动（动态掩码+T5填充+失败回退）
-│   ├── setting.py       # 实验参数配置（输出目录、模型参数管理）
-│   ├── save_results.py  # 结果保存（JSON/CSV）与可视化（ROC曲线、似然分布图）
-│   └── baselines/       # 基线算法模块
-│       ├── detectGPT.py # DetectGPT 核心算法（曲率计算、阈值判断）
-│       ├── likelihood.py # 似然阈值法基线实现
-│       ├── model.py     # 模型加载（GPT/T5）与似然值计算封装
-│       └── run_baselines.py # 基线算法运行与结果对比
-├── run.py               # 主实验运行脚本（参数解析、流程调度）
-├── requirements.txt     # 项目依赖文件（含版本锁定）
-└── README.md            # 项目说明文档（当前文档）
-```
+DetectGPT项目架构
+├── 核心配置与入口
+│   ├── run.py（实验主入口：参数解析、流程调度）
+│   └── setting.py（配置层：输出目录创建、参数保存、环境初始化）
+├── 核心算法模块
+│   ├── detectGPT.py（DetectGPT核心逻辑：概率曲率计算、扰动-似然对比）
+│   └── run_baselines.py（基线算法调度：调用baselines下的各类检测方法）
+├── 工具支撑层
+│   ├── model.py（模型工具：扰动生成、归一化似然计算、自适应参数调整）
+│   ├── metric.py（评估工具：ROC-AUC计算、分类决策阈值判定）
+│   └── utils/（工具子目录）
+│       └── baselines/（基线算法实现）
+│           ├── entropy.py（熵阈值检测算法）
+│           ├── likelihood.py（似然阈值检测算法）
+│           ├── rank.py（排序阈值检测算法）
+│           └── supervised.py（有监督分类基线）
+├── 数据与结果层
+│   ├── generate_data.py（数据工具：数据集加载、过滤、回退机制）
+│   ├── save_results.py（结果工具：结果存储、格式转换、可视化）
+│   ├── data/（数据集目录：WritingPrompts等需手动下载）
+│   ├── tmp_results/（中间结果目录：实验过程临时数据）
+│   └── results/（最终结果目录：含args.json、各类阈值结果文件）
+└── 辅助文件
+    ├── .git/（Git版本管理目录）
+    ├── __pycache__/（Python编译缓存目录）
+    └── __init__.py（包初始化文件）
+
 
 
 ## 环境配置
